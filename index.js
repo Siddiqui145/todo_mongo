@@ -1,4 +1,5 @@
 const app = require('./app');
+const db = require('./configurations/db.js') //mongo imported
 
 const port = 3000;
 
