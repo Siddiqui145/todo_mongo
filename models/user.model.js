@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const db = require ('../configurations/db');
 
+const bcrypt = require('bcrypt'); //for hashing our password
+
 const {Schema} = mongoose;
 
 const userSchema = new Schema ({
@@ -14,6 +16,19 @@ const userSchema = new Schema ({
         type: String,
         required: true,
     },
+});
+
+userSchema.pre('save', async function () {
+    try{
+        var user = this;
+        const salt = await(bcrypt.k,genSalt(10)); //inbuilt for hashing, 10 is hashing factor
+        const hashpass = await bcrypt.hash(user.password, salt); //passes pass. for hashing
+
+        user.password = hashpass; //now store hashed password
+    }
+    catch(err){
+        throw err;
+    }
 })
 
 const UserModel = db.model('user', userSchema);
