@@ -21,7 +21,7 @@ const userSchema = new Schema ({
 userSchema.pre('save', async function () {
     try{
         var user = this;
-        const salt = await(bcrypt.k,genSalt(10)); //inbuilt for hashing, 10 is hashing factor
+        const salt = await bcrypt.genSalt(10); //inbuilt for hashing, 10 is hashing factor
         const hashpass = await bcrypt.hash(user.password, salt); //passes pass. for hashing
 
         user.password = hashpass; //now store hashed password
@@ -30,6 +30,16 @@ userSchema.pre('save', async function () {
         throw err;
     }
 })
+
+userSchema.methods.comparePassword = async function(userPassword){
+    try{
+        const isMatch = await bcrypt.compare(userPassword, this.password)
+        return isMatch;
+    }
+    catch (err){
+        throw err;
+    }
+}
 
 const UserModel = db.model('user', userSchema);
 
