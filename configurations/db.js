@@ -1,6 +1,6 @@
 const mongoose = require('mongoose'); //Import mongoose
 
-const connection = mongoose.createConnection('mongodb://127.0.0.1:27017/todo-app'); //inbuilt command for creating connection
+const connection = mongoose.createConnection('mongodb://127.0.0.1:27017/todo-appp'); //inbuilt command for creating connection
 
 connection.on('open', () => {
     console.log("MongoDB Connected");
