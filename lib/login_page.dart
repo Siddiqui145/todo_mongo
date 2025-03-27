@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_app/config.dart';
+import 'package:todo_app/dashboard.dart';
 import 'package:todo_app/registration.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'applogo.dart';
@@ -30,30 +34,64 @@ class SignInPageState extends State<SignInPage> {
     prefs = await SharedPreferences.getInstance();
   }
 
-  // void loginUser() async{
-  //   if(emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
+void loginUser() async {
+  if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+    var reqBody = {
+      "email": emailController.text,
+      "password": passwordController.text
+    };
 
-  //     var reqBody = {
-  //       "email":emailController.text,
-  //       "password":passwordController.text
-  //     };
+    try {
+      var response = await http.post(
+        Uri.parse(login),
+        headers: {'Content-Type': "application/json"},
+        body: jsonEncode(reqBody),
+      );
 
-  //     var response = await http.post(Uri.parse(login),
-  //         headers: {"Content-Type":"application/json"},
-  //         body: jsonEncode(reqBody)
-  //     );
+      print("Response Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-  //     var jsonResponse = jsonDecode(response.body);
-  //     if(jsonResponse['status']){
-  //         var myToken = jsonResponse['token'];
-  //         prefs.setString('token', myToken);
-  //         Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard(token: myToken)));
-  //     }else{
-  //       print('Something went wrong');
-  //     }
+      var jsonResponse = jsonDecode(response.body);
+      print("Parsed JSON: $jsonResponse"); // Debugging
 
-  //   }
-  // }
+      if (response.statusCode == 200 && jsonResponse['status'] == true) {
+        var tokenData = jsonResponse['token'];
+
+        if (tokenData is String && tokenData.isNotEmpty) {
+          prefs.setString('token', tokenData);
+          print("Token saved: $tokenData"); // Debugging
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Dashboard(token: tokenData)),
+          );
+        } else {
+          print("Invalid Token Received: $tokenData");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid token received. Please try again.')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(jsonResponse['message'] ?? 'Login Failed')),
+        );
+      }
+    } catch (e) {
+      print("Login Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Server connection error.')),
+      );
+    }
+  } else {
+    setState(() {
+      _isNotValidate = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please enter email & password.')),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +142,7 @@ class SignInPageState extends State<SignInPage> {
                   ).p4().px24(),
                   GestureDetector(
                     onTap: (){
-                        //loginUser();
+                        loginUser();
                     },
                     child: HStack([
                       VxBox(child: "LogIn".text.white.makeCentered().p16()).green600.roundedLg.make(),

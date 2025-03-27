@@ -19,34 +19,44 @@ class _RegistrationState extends State<Registration> {
   TextEditingController passwordController = TextEditingController();
   bool _isNotValidate = false;
 
-  void registerUser() async{
-    if(emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
+  void registerUser() async {
+  if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+    var regBody = {
+      "email": emailController.text,
+      "password": passwordController.text
+    };
 
-      var regBody = {
-        "email":emailController.text,
-        "password":passwordController.text
-      };
-
-      var response = await http.post(Uri.parse(registration),
-      headers: {"Content-Type":"application/json"},
-      body: jsonEncode(regBody)
+    try {
+      var response = await http.post(
+        Uri.parse(registration),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(regBody),
       );
 
-      var jsonResponse = jsonDecode(response.body);
+      print("Response Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-      print(jsonResponse['status']);
-
-      if(jsonResponse['status']){
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignInPage()));
-      }else{
-        print("SomeThing Went Wrong");
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status']) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => SignInPage()));
+        } else {
+          print("Server Error: ${jsonResponse['message']}");
+        }
+      } else {
+        print("Error: ${response.statusCode}");
       }
-    }else{
-      setState(() {
-        _isNotValidate = true;
-      });
+    } catch (e) {
+      print("Exception: $e");
     }
+  } else {
+    setState(() {
+      _isNotValidate = true;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
