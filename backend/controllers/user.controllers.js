@@ -13,30 +13,36 @@ exports.register = async(req, res, next) => {
     }
 }
 
-exports.login = async(req, res, next) => {
+exports.login = async (req, res, next) => {
     try {
-        const {email, password} = req.body;
+        const { email, password } = req.body;
+        console.log("Login Attempt:", email, password); // Debugging
 
         const user = await UserService.checkUser(email);
 
-        if(!user){
-            throw new Error("User does not exist")
+        if (!user) {
+            return res.status(400).json({ status: false, message: "User does not exist" });
         }
 
-        const isMatch = await user.comparePassword(password)
-
-        if(isMatch === false){
-            throw new Error('Password Invalid')
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(400).json({ status: false, message: "Invalid password" });
         }
 
-        let tokenData = {_id:user._id, email: user.email};
+        let tokenData = { _id: user._id, email: user.email };
 
-        const token = UserService.generateToken(tokenData, "123456", "1h")
+        const token = await UserService.generateToken(tokenData, "123456", "1h");
 
-        res.status(200).json({status: true, token: token })
-        
+        if (!token) {
+            console.error("Error: Token is null or undefined");
+            return res.status(500).json({ status: false, message: "Token generation failed" });
+        }
+
+        console.log("Generated Token:", token); // Debugging
+
+        return res.status(200).json({ status: true, token: token });
+    } catch (e) {
+        console.error("Login Error:", e);
+        return res.status(500).json({ status: false, message: "Server error" });
     }
-    catch (e){
-        throw e;
-    }
-}
+};

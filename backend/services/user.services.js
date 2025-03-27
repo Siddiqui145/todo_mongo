@@ -16,16 +16,26 @@ class UserService {
     }
 
     static async checkUser(email){
-        try{
-            return await UserModel.findOne({email});
-        }
-        catch(err){
+        try {
+            const user = await UserModel.findOne({ email: email });
+            console.log("User Found:", user); // Debug log
+            return user;
+        } catch (err) {
+            console.error("Database Error:", err);
             throw err;
         }
     }
 
     static async generateToken(tokenData, secretKey, jwt_expire){
-        return jwt.sign(tokenData, secretKey, {expiresIn: jwt_expire});
+        try {
+            const token = jwt.sign(tokenData, secretKey, { expiresIn: jwt_expire });
+            console.log("Generated Token:", token); // Debug log
+            return token;
+        }
+        catch (error) {
+            console.error("JWT Error:", error);
+            return null;  // Ensure it does not return an empty object
+        }
     }
 }
 
