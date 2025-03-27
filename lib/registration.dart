@@ -37,7 +37,7 @@ class _RegistrationState extends State<Registration> {
       print(jsonResponse['status']);
 
       if(jsonResponse['status']){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>SignInPage()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignInPage()));
       }else{
         print("SomeThing Went Wrong");
       }

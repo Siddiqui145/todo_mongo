@@ -7,11 +7,13 @@ import 'applogo.dart';
 
 
 class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
   @override
-  _SignInPageState createState() => _SignInPageState();
+  SignInPageState createState() => SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class SignInPageState extends State<SignInPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _isNotValidate = false;
