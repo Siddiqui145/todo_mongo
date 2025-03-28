@@ -1,48 +1,54 @@
-const UserService = require('../services/user.services');
+const UserServices = require('../services/user.service');
 
-exports.register = async(req, res, next) => {
+exports.register = async (req, res, next) => {
     try {
-        const {email, password} = req.body;
+        console.log("---req body---", req.body);
+        const { email, password } = req.body;
+        const duplicate = await UserServices.getUserByEmail(email);
+        if (duplicate) {
+            throw new Error(`UserName ${email}, Already Registered`)
+        }
+        const response = await UserServices.registerUser(email, password);
 
-        const successRes = await UserService.registerUser(email, password);
+        res.json({ status: true, success: 'User registered successfully' });
 
-        res.json({status:true, success: "User Registered Successfully!!"});
-    }
-    catch (e){
-        throw e;
+
+    } catch (err) {
+        console.log("---> err -->", err);
+        next(err);
     }
 }
 
 exports.login = async (req, res, next) => {
     try {
+
         const { email, password } = req.body;
-        console.log("Login Attempt:", email, password); // Debugging
 
-        const user = await UserService.checkUser(email);
-
+        if (!email || !password) {
+            throw new Error('Parameter are not correct');
+        }
+        let user = await UserServices.checkUser(email);
         if (!user) {
-            return res.status(400).json({ status: false, message: "User does not exist" });
+            throw new Error('User does not exist');
         }
 
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(400).json({ status: false, message: "Invalid password" });
+        const isPasswordCorrect = await user.comparePassword(password);
+
+        if (isPasswordCorrect === false) {
+            throw new Error(`Username or Password does not match`);
         }
 
-        let tokenData = { _id: user._id, email: user.email };
+        // Creating Token
 
-        const token = await UserService.generateToken(tokenData, "123456", "1h");
+        let tokenData;
+        tokenData = { _id: user._id, email: user.email };
+    
 
-        if (!token) {
-            console.error("Error: Token is null or undefined");
-            return res.status(500).json({ status: false, message: "Token generation failed" });
-        }
+        const token = await UserServices.generateAccessToken(tokenData,"secret","1h")
 
-        console.log("Generated Token:", token); // Debugging
-
-        return res.status(200).json({ status: true, token: token });
-    } catch (e) {
-        console.error("Login Error:", e);
-        return res.status(500).json({ status: false, message: "Server error" });
+        res.status(200).json({ status: true, success: "sendData", token: token });
+    } catch (error) {
+        console.log(error, 'err---->');
+        next(error);
     }
-};
+}
