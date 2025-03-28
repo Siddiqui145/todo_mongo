@@ -1,12 +1,12 @@
-const express = require('express');
-const body_parser = require('body-parser'); //used to handle data that arrives from routes
-const userRouter = require('./routers/user.router')
-
+const express = require("express");
+const bodyParser = require("body-parser")
+const UserRoute = require("./routes/user.routes");
+const ToDoRoute = require('./routes/todo.router');
 const app = express();
 
-app.use(express.json());  // <-- This ensures JSON body parsing
-app.use(body_parser.json());
+app.use(bodyParser.json())
 
-app.use('/', userRouter);
+app.use("/",UserRoute);
+app.use("/",ToDoRoute);
 
 module.exports = app;
