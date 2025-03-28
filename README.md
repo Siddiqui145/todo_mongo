@@ -1,16 +1,100 @@
-# todo_app
+# To-Do App
 
-A new Flutter project.
+A simple To-Do application built with Flutter for the frontend and Node.js with MongoDB for the backend.
 
-## Getting Started
+## Features
+- User authentication (Sign Up, Login, Logout)
+- Secure password storage with bcrypt
+- Token-based authentication using JWT
+- Task management functionalities (to be implemented)
 
-This project is a starting point for a Flutter application.
+## Tech Stack
+### Frontend (Flutter)
+- Dart
+- Flutter framework
+- HTTP package for API calls
+- Shared Preferences for local storage
+- VelocityX for UI components
 
-A few resources to get you started if this is your first Flutter project:
+### Backend (Node.js)
+- Express.js
+- MongoDB with Mongoose
+- JSON Web Tokens (JWT) for authentication
+- Bcrypt for password hashing
+- Nodemon for development
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Setup Instructions
+### Backend
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Siddiqui145/todo_mongo.git
+   ```
+2. Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the backend server:
+   ```bash
+   npm run dev
+   ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Frontend
+1. Navigate to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
+3. Run the app:
+   ```bash
+   flutter run
+   ```
+
+## API Endpoints
+### Authentication
+- **POST** `/register` - Register a new user
+- **POST** `/login` - Login user and receive JWT token
+
+## Environment Variables
+Create a `.env` file in the backend directory and set up the following variables:
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+
+## Project Structure
+```
+├── frontend
+│   ├── lib
+│   │   ├── main.dart
+│   │   ├── login_page.dart
+│   │   ├── registration.dart
+│   │   ├── dashboard.dart
+│   │   ├── config.dart
+├── backend
+│   ├── models
+│   │   ├── user.model.js
+│   ├── routes
+│   │   ├── user.router.js
+│   ├── services
+│   │   ├── user.services.js
+│   ├── configurations
+│   │   ├── db.js
+│   ├── app.js
+│   ├── index.js
+```
+
+## Future Improvements
+- Task management features
+- UI enhancements
+- Deploying the backend to a cloud service
+- Implementing password reset functionality
+
+## License
+This project is licensed under the MIT License.
